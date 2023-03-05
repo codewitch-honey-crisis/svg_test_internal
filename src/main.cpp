@@ -3,9 +3,10 @@
 using namespace gfx;
 using bitmap_t = bitmap<rgb_pixel<24>>;
 using color_t = color<typename bitmap_t::pixel_type>;
-constexpr static const size16 bmp_size(320,200);
-static uint8_t bmp_data[bitmap_t::sizeof_buffer(bmp_size)];
-bitmap_t bmp(bmp_size,bmp_data);
+constexpr static const size16 bmp_size(80,50);
+constexpr static const size_t bmp_bytes = bitmap_t::sizeof_buffer(bmp_size);
+static uint8_t bmp_data[bmp_bytes];
+
 // prints a source as 4-bit grayscale ASCII
 template <typename Source>
 void print_source(const Source& src) {
@@ -24,19 +25,24 @@ void print_source(const Source& src) {
 }
 
 int main(int argc, char**argv) {
-    file_stream fs("..\\..\\..\\drawing.svg",io::file_mode::read);
-    svg_doc doc,doc2;
-    gfx_result res=gfx::svg_doc::read(&fs,&doc);
+    file_stream fs("microsd-card-icon.svg",io::file_mode::read);
+    if(!fs.caps().read) {
+        printf("file not found.\n");
+        return 1;
+    }
+    svg_doc doc;
+    gfx_result res;
+   
+    res=gfx::svg_doc::read(&fs,&doc);
     if(res!=gfx_result::success) {
         printf("Error: %d\n",(int)res);
     }
-    fs.seek(0);
-    res=gfx::svg_doc::read2(&fs,&doc2);
-    if(res!=gfx_result::success) {
-        printf("Error: %d\n",(int)res);
-    }
+    fs.close();
+    bitmap_t bmp(bmp_size,bmp_data);
     bmp.fill(bmp.bounds(),color_t::white);
-    draw::svg(bmp,(srect16)bmp.bounds(),doc,.5);
-    //print_source(bmp);
+    draw::svg(bmp,(srect16)bmp.bounds(),doc,doc.scale(bmp.dimensions()));
+    print_source(bmp);
+   
+    
     return 0;
 }
