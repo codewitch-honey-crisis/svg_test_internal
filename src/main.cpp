@@ -43,7 +43,7 @@ int main(int argc, char**argv) {
     // fill the bitmap with white
     bmp.fill(bmp.bounds(),color_t::white);
     // draw the svg to the bitmap dimensions (preserves aspect ratio)
-    draw::svg(bmp,(srect16)bmp.bounds(),doc,doc.scale(bmp.dimensions()));
+    draw::svg(bmp,bmp.bounds(),doc,doc.scale(bmp.dimensions()));
     // print the bitmap
     print_source(bmp);
 
