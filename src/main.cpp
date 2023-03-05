@@ -6,7 +6,9 @@ using color_t = color<typename bitmap_t::pixel_type>;
 constexpr static const size16 bmp_size(80,50);
 constexpr static const size_t bmp_bytes = bitmap_t::sizeof_buffer(bmp_size);
 static uint8_t bmp_data[bmp_bytes];
-
+// create the bitmap to draw to
+bitmap_t bmp(bmp_size,bmp_data);
+    
 // prints a source as 4-bit grayscale ASCII
 template <typename Source>
 void print_source(const Source& src) {
@@ -38,11 +40,12 @@ int main(int argc, char**argv) {
         printf("Error: %d\n",(int)res);
     }
     fs.close();
-    bitmap_t bmp(bmp_size,bmp_data);
+    // fill the bitmap with white
     bmp.fill(bmp.bounds(),color_t::white);
+    // draw the svg to the bitmap dimensions (preserves aspect ratio)
     draw::svg(bmp,(srect16)bmp.bounds(),doc,doc.scale(bmp.dimensions()));
+    // print the bitmap
     print_source(bmp);
-   
-    
+
     return 0;
 }
